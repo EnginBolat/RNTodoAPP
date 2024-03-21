@@ -11,6 +11,7 @@
     "dependencies": {
         "@gorhom/bottom-sheet": "^4",
         "@react-native-community/datetimepicker": "7.6.1",
+        "axios": "^1.6.8",
         "expo": "~50.0.14",
         "expo-checkbox": "~2.7.0",
         "expo-status-bar": "~1.11.1",
@@ -25,6 +26,7 @@
     "devDependencies": {
         "@babel/core": "^7.20.0",
         "@types/react": "~18.2.45",
+        "react-native-dotenv": "^3.4.11",
         "tailwindcss": "^3.3.2",
         "typescript": "^5.1.3"
     },
