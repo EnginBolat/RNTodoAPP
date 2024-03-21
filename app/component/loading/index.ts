@@ -1,0 +1,1 @@
+export {default as CustomLoading} from './_layout';
