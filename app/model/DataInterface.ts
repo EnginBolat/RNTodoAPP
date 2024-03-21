@@ -1,7 +1,7 @@
 export interface DataInterface {
-    id: number;
-    name: String;
-    details: String;
+    id?: number;
+    title: String;
+    description: String;
     createdDate: string;
     isDone: boolean;
 }
