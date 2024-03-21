@@ -1,0 +1,1 @@
+export {default as PrimaryTitle} from './_layout';
