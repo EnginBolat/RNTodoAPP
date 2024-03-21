@@ -9,17 +9,19 @@ import moment from "moment";
 const AddTodo: React.FC<{
     title: string;
     setTitle: React.Dispatch<React.SetStateAction<string>>,
-    detail: string,
-    setDetail: React.Dispatch<React.SetStateAction<string>>,
+    description: string,
+    setDescription: React.Dispatch<React.SetStateAction<string>>,
     date: Date,
     setDate: React.Dispatch<React.SetStateAction<Date>>,
+    onPress: any;
 }> = ({
     title,
     setTitle,
-    detail,
-    setDetail,
+    description,
+    setDescription,
     date,
     setDate,
+    onPress,
 }) => {
 
         const selectDatebottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -40,8 +42,8 @@ const AddTodo: React.FC<{
             />
             <View className="my-1" />
             <PrimaryInput
-                value={detail}
-                setValue={setDetail}
+                value={description}
+                setValue={setDescription}
                 placeHolder='Details'
             />
 
@@ -50,7 +52,7 @@ const AddTodo: React.FC<{
                 <Button title="Select Date" onPress={selectDatehandlePresentModalPress} color={'black'} />
             </View>
             <View className="my-2 bottom-0">
-                <PrimaryButton title="Add" onPress={() => { }} />
+                <PrimaryButton title="Add" onPress={onPress} />
             </View>
 
             <BottomSheetModal
