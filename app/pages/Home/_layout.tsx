@@ -8,53 +8,35 @@ import Checkbox from 'expo-checkbox';
 import { FloatingAction } from "react-native-floating-action";
 import axios, { HttpStatusCode } from 'axios';
 import moment from "moment";
+import { useAppDispatch, useAppSelector } from "../../redux/store";
+import { addTodo, deleteTodo, performOperation, updateTodo } from "../../redux/todoSlice";
 
 const Home = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [date, setDate] = useState(new Date());
-    const [data, setData] = useState<any>()
-    const [loading, setLoading] = useState(true)
 
-    async function fetchTodo() {
-        try {
-            const response = await axios.get(`http://localhost:3000/api/v1/todo/`);
-            if (response.status === HttpStatusCode.Ok) {
-                setData(response.data);
-                setLoading(false);
-            }
-        } catch (error) {
-            console.error("Error fetching todos:", error);
-        }
-    }
 
-    async function addTodo() {
+    const { data, loading } = useAppSelector((state) => state.todo);
+    const todoDispatch = useAppDispatch();
+
+    useEffect(() => {
+        todoDispatch(performOperation({ method: 'GET' }));
+    }, []);
+
+    async function addTodoFunc() {
         try {
-            var item: DataInterface = {
+            const item: DataInterface = {
                 title: title,
                 description: description,
                 createdDate: date.toString(),
                 isDone: false
-            }
-            const response = await axios.post(`http://localhost:3000/api/v1/todo/`, {
-                title: item.title,
-                description: item.description,
-                createdDate: item.createdDate,
-                isDone: item.isDone
-            });
-            if (response.status === HttpStatusCode.Created) {
-                console.log('Data Added')
-                bottomSheetModalRef.current?.close();
-                fetchTodo();
-            }
+            };
+            await todoDispatch(addTodo(item));
         } catch (error) {
-            console.error("Data Can't Added:", error);
+            console.error('Perform operation hatası:', error);
         }
     }
-
-    useEffect(() => {
-        fetchTodo();
-    }, [])
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
     const snapPoints = useMemo(() => ['50%', '50%'], []);
@@ -70,6 +52,10 @@ const Home = () => {
     }
 
     function renderItem() {
+        if (!data) {
+            return <CustomLoading />; // veya bir yükleme göstergesi veya hata mesajı döndürebilirsiniz
+        }
+
         const groupedData: { [key: string]: DataInterface[] } = {};
         const today = moment().format('YYYY-MM-DD'); // Bugünkü tarih
 
@@ -97,7 +83,6 @@ const Home = () => {
         <BottomSheetModalProvider>
             <SafeAreaView className="flex flex-1">
                 <ScrollView showsVerticalScrollIndicator={false}>
-                    <PrimaryTitle title="Today" />
                     {renderItem()}
                     <BottomSheetModal
                         containerStyle={{ backgroundColor: 'rgba(0,0,0,0.80)' }}
@@ -114,7 +99,7 @@ const Home = () => {
                             setDescription={setDescription}
                             date={date}
                             setDate={setDate}
-                            onPress={addTodo}
+                            onPress={addTodoFunc}
                         />
                     </BottomSheetModal>
                 </ScrollView>
@@ -135,22 +120,31 @@ export default Home;
 
 const DetailsRow: React.FC<{ item: DataInterface, onPress: any }> = ({ item, onPress }) => {
 
-    async function updateIsDone(item: DataInterface) {
+    const todoDispatch = useAppDispatch();
+
+    async function updateIsDone(item: DataInterface, isDone: boolean) {
         try {
-            var response = await axios.put(`http://localhost:3000/api/v1/todo/${item.id}`, {
+            await todoDispatch(updateTodo({
                 id: item.id,
                 title: item.title,
                 description: item.description,
                 createdDate: item.createdDate,
-                isDone: item.isDone
-            });
-            if (response.status == HttpStatusCode.Ok) {
-                console.log('Update Is Success')
-            }
+                isDone: isDone
+            }));
         } catch (error) {
-            console.log(`Update Error: ${error}`)
+            console.error('Perform operation hatası:', error);
         }
     }
+
+    async function deleteData(id: number) {
+        try {
+            // Güncelleme işlemini gerçekleştir
+            await todoDispatch(deleteTodo(id));
+        } catch (error) {
+            console.error('Perform operation hatası:', error);
+        }
+    }
+
 
     const [selected, setSelected] = useState(item.isDone);
 
@@ -159,16 +153,15 @@ const DetailsRow: React.FC<{ item: DataInterface, onPress: any }> = ({ item, onP
     }, [item.isDone]);
 
     return (
-        <AppleStyleSwipable>
+        <AppleStyleSwipable onPress={() => { deleteData(item.id!) }}>
             <View className="flex flex-row items-center justify-between mr-4" key={item.id}>
                 <View className="flex flex-row items-center">
                     <Checkbox
                         className="mx-4 my-4 rounded-md border-opacity-5"
                         value={selected}
                         onValueChange={(value: boolean) => {
-                            item.isDone = !item.isDone;
-                            setSelected(value)
-                            updateIsDone(item)
+                            setSelected(value); // selected durumunu güncelle
+                            updateIsDone(item, value)
                         }}
                         color={'black'}
                     />

@@ -4,8 +4,12 @@ import { Animated, StyleSheet, Text, View, I18nManager } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
+interface AppleStyleSwipeableRowProps {
+    onPress?: () => void; // Dışarıdan iletilen onPress işlevi
+}
+
 export default class AppleStyleSwipeableRow extends Component<
-    PropsWithChildren<unknown>
+    PropsWithChildren<AppleStyleSwipeableRowProps>
 > {
     private renderRightAction = (
         text: string,
@@ -26,7 +30,7 @@ export default class AppleStyleSwipeableRow extends Component<
             <Animated.View style={{ flex: 1, transform: [{ translateX: trans }] }}>
                 <RectButton
                     style={[styles.rightAction, { backgroundColor: color }]}
-                    onPress={pressHandler}>
+                    onPress={this.props.onPress}>
                     <Text style={styles.actionText}>{text}</Text>
                 </RectButton>
             </Animated.View>

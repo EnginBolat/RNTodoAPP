@@ -11,6 +11,7 @@
     "dependencies": {
         "@gorhom/bottom-sheet": "^4",
         "@react-native-community/datetimepicker": "7.6.1",
+        "@reduxjs/toolkit": "^2.2.2",
         "axios": "^1.6.8",
         "expo": "~50.0.14",
         "expo-checkbox": "~2.7.0",
@@ -21,7 +22,8 @@
         "react-native": "0.73.6",
         "react-native-floating-action": "^1.22.0",
         "react-native-gesture-handler": "~2.14.0",
-        "react-native-reanimated": "~3.6.2"
+        "react-native-reanimated": "~3.6.2",
+        "react-redux": "^9.1.0"
     },
     "devDependencies": {
         "@babel/core": "^7.20.0",
