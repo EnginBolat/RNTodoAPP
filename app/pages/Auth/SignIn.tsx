@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 
 import { ErrorText, PrimaryButton, PrimaryInput, PrimaryTitle } from "../../component";
 import { View, Text, TouchableOpacity } from "react-native"
+import { useNavigation } from "@react-navigation/native";
 
 interface SignInModel {
     email: string;
@@ -11,6 +12,8 @@ interface SignInModel {
 }
 
 const SignIn = () => {
+    const navigation = useNavigation<any>();
+
     const SignInScheme = Yup.object().shape({
         email: Yup.string().email('Invalid email').required('Required'),
         password: Yup.string().required('Required'),
@@ -18,6 +21,7 @@ const SignIn = () => {
 
     async function handleSubmit(value: SignInModel) {
         console.log(`Email: ${value.email}\nPassword: ${value.password}`);
+        navigation.navigate('Home')
     }
 
     return <View className="flex flex-1 justify-center items-center p-3">
@@ -56,7 +60,7 @@ const SignIn = () => {
                 </View>
             )}
         </Formik>
-        <TouchableOpacity onPress={() => { console.log('Clicked'); }} className="pt-5">
+        <TouchableOpacity onPress={() => { navigation.navigate('ForgotPassword') }} className="pt-5">
             <Text className="text-black underline">Forgot Password?</Text>
         </TouchableOpacity>
     </View>
