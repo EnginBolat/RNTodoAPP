@@ -44,6 +44,7 @@ const AddTodo: React.FC<{
             <PrimaryInput
                 value={description}
                 setValue={setDescription}
+                maxLength={120}
                 placeHolder='Details'
             />
 
