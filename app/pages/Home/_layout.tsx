@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, SafeAreaView, ScrollView, } from 'react-native';
-import { AppleStyleSwipable, PrimaryTitle, CustomLoading } from "../../component";
-import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from "@gorhom/bottom-sheet";
+import { AppleStyleSwipable, CustomLoading, PrimaryTitle } from "../../component";
+import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { DataInterface } from "../../model/DataInterface";
 import { AddTodo } from "../AddTodo";
 import Checkbox from 'expo-checkbox';
 import { FloatingAction } from "react-native-floating-action";
-import axios, { HttpStatusCode } from 'axios';
 import moment from "moment";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { addTodo, deleteTodo, performOperation, updateTodo } from "../../redux/todoSlice";
@@ -22,6 +21,7 @@ const Home = () => {
 
     useEffect(() => {
         todoDispatch(performOperation({ method: 'GET' }));
+        createGreetings();
     }, []);
 
     async function addTodoFunc() {
@@ -51,9 +51,33 @@ const Home = () => {
         return <CustomLoading />
     }
 
+    function createGreetings() {
+        var hour = new Date();
+        return <View className="flex items-start justify-start">
+            <PrimaryTitle
+                style="font-bold text-xl"
+                title={`
+        ${hour.getHours() > 0
+                        ? hour.getHours() >= 11
+                            ? "Good afternoon"
+                            : "Good morning"
+                        : hour.getHours() >= 12
+                            ? "Have a good day"
+                            : "Evening"}`
+                }
+            />
+        </View>
+    }
+
     function renderItem() {
         if (!data) {
             return <CustomLoading />; // veya bir yükleme göstergesi veya hata mesajı döndürebilirsiniz
+        }
+
+        if (data.length <= 0) {
+            return <View className="flex flex-1 items-center justify-center">
+                <PrimaryTitle title="No To Do Found" style="text-gray-500 font-semibold text-lg" />
+            </View>; // Eğer daha önceden eklenen bir iş yoksa:
         }
 
         const groupedData: { [key: string]: DataInterface[] } = {};
@@ -82,7 +106,8 @@ const Home = () => {
     return (
         <BottomSheetModalProvider>
             <SafeAreaView className="flex flex-1">
-                <ScrollView showsVerticalScrollIndicator={false}>
+                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flex: 1 }}>
+                    {createGreetings()}
                     {renderItem()}
                     <BottomSheetModal
                         containerStyle={{ backgroundColor: 'rgba(0,0,0,0.80)' }}
