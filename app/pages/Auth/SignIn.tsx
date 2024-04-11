@@ -2,8 +2,8 @@ import React from "react"
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 
-import { PrimaryButton, PrimaryInput, PrimaryTitle } from "../../component";
-import { View, Text } from "react-native"
+import { ErrorText, PrimaryButton, PrimaryInput, PrimaryTitle } from "../../component";
+import { View, Text, TouchableOpacity } from "react-native"
 
 interface SignInModel {
     email: string;
@@ -56,12 +56,10 @@ const SignIn = () => {
                 </View>
             )}
         </Formik>
+        <TouchableOpacity onPress={() => { console.log('Clicked'); }} className="pt-5">
+            <Text className="text-black underline">Forgot Password?</Text>
+        </TouchableOpacity>
     </View>
 }
 
 export default SignIn;
-
-
-const ErrorText: React.FC<{ title: string }> = ({ title }) => {
-    return <Text className="my-2 text-red-600">{title}</Text>
-}
