@@ -40,6 +40,7 @@ const Home = () => {
                 isDone: false
             };
             await todoDispatch(addTodo(item));
+            bottomSheetModalRef.current?.close();
         } catch (error) {
             console.error('Perform operation hatası:', error);
         }
@@ -47,18 +48,16 @@ const Home = () => {
 
     function createGreetings() {
         var hour = new Date();
+        var message: string = ""
+        if (hour.getHours() <= 5) { message = "Good Morning" }
+        else if (hour.getHours() <= 12) { message = "Good Evening" }
+        else if (hour.getHours() <= 14) { message = "Have a good day" }
+        else if (hour.getHours() <= 21) { message = "Good Night" }
+
         return <View className="flex items-start justify-start">
-            <PrimaryTitle style="font-bold text-xl" title={`
-        ${hour.getHours() > 0
-                    ? hour.getHours() >= 11
-                        ? "Good afternoon"
-                        : "Good morning"
-                    : hour.getHours() >= 12
-                        ? "Have a good day"
-                        : "Evening"}`
-            }
-            />
+            <PrimaryTitle style="font-bold text-xl m-3" title={message} />
         </View>
+
     }
 
     function renderItem() {
@@ -82,7 +81,6 @@ const Home = () => {
             }
             groupedData[dateKey].push(item);
         });
-
         return Object.keys(groupedData).map((date: string, index: number) => (
             <View key={index} >
                 <Text className="px-3 text-lg font-bold mt-5">{date === today ? 'Today' : moment(date).format('D MMMM')}</Text>
@@ -174,14 +172,14 @@ const DetailsRow: React.FC<{ item: DataInterface, onPress: any }> = ({ item, onP
                         className="mx-4 my-4 rounded-md border-opacity-5"
                         value={selected}
                         onValueChange={(value: boolean) => {
-                            setSelected(value); // selected durumunu güncelle
-                            updateIsDone(item, value)
+                            setSelected(value);
+                            updateIsDone(item, value);
                         }}
                         color={'black'}
                     />
                     <View className="flex flex-col items-start">
                         <Text className="font-bold " style={{ textDecorationLine: selected ? 'line-through' : 'none' }}>{item.title}</Text>
-                        <Text>{`${item.description.substring(0, 50)}...`}</Text>
+                        <Text>{`${item.description.length > 15 ? `${item.description.substring(0, 50)}...` : item.description}`}</Text>
                     </View>
                 </View>
                 <Text>{moment(item.createdDate).format('D MMMM YYYY HH:MM')}</Text>
