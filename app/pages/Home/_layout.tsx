@@ -14,9 +14,16 @@ const Home = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [date, setDate] = useState(new Date());
+    const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+    const snapPoints = useMemo(() => ['50%', '50%'], []);
+    const handlePresentModalPress = useCallback(() => {
+        bottomSheetModalRef.current?.present();
+    }, []);
+    const handleSheetChanges = useCallback((index: number) => {
+        console.log('handleSheetChanges', index);
+    }, []);
 
-
-    const { data, loading } = useAppSelector((state) => state.todo);
+    const { data } = useAppSelector((state) => state.todo);
     const todoDispatch = useAppDispatch();
 
     useEffect(() => {
@@ -38,33 +45,18 @@ const Home = () => {
         }
     }
 
-    const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-    const snapPoints = useMemo(() => ['50%', '50%'], []);
-    const handlePresentModalPress = useCallback(() => {
-        bottomSheetModalRef.current?.present();
-    }, []);
-    const handleSheetChanges = useCallback((index: number) => {
-        console.log('handleSheetChanges', index);
-    }, []);
-
-    if (loading) {
-        return <CustomLoading />
-    }
-
     function createGreetings() {
         var hour = new Date();
         return <View className="flex items-start justify-start">
-            <PrimaryTitle
-                style="font-bold text-xl"
-                title={`
+            <PrimaryTitle style="font-bold text-xl" title={`
         ${hour.getHours() > 0
-                        ? hour.getHours() >= 11
-                            ? "Good afternoon"
-                            : "Good morning"
-                        : hour.getHours() >= 12
-                            ? "Have a good day"
-                            : "Evening"}`
-                }
+                    ? hour.getHours() >= 11
+                        ? "Good afternoon"
+                        : "Good morning"
+                    : hour.getHours() >= 12
+                        ? "Have a good day"
+                        : "Evening"}`
+            }
             />
         </View>
     }
@@ -100,8 +92,6 @@ const Home = () => {
             </View>
         ));
     }
-
-
 
     return (
         <BottomSheetModalProvider>
@@ -163,7 +153,6 @@ const DetailsRow: React.FC<{ item: DataInterface, onPress: any }> = ({ item, onP
 
     async function deleteData(id: number) {
         try {
-            // Güncelleme işlemini gerçekleştir
             await todoDispatch(deleteTodo(id));
         } catch (error) {
             console.error('Perform operation hatası:', error);
@@ -192,7 +181,7 @@ const DetailsRow: React.FC<{ item: DataInterface, onPress: any }> = ({ item, onP
                     />
                     <View className="flex flex-col items-start">
                         <Text className="font-bold " style={{ textDecorationLine: selected ? 'line-through' : 'none' }}>{item.title}</Text>
-                        <Text>{item.description}</Text>
+                        <Text>{`${item.description.substring(0, 50)}...`}</Text>
                     </View>
                 </View>
                 <Text>{moment(item.createdDate).format('D MMMM YYYY HH:MM')}</Text>
