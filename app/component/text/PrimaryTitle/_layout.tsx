@@ -1,9 +1,9 @@
 import React from "react";
 import { Text } from 'react-native';
 
-const PrimaryTitle: React.FC<{ title: string, style?: string }> = ({ title, style }) => {
+const PrimaryTitle: React.FC<{ title: string, style?: string, isHaveMargin?: boolean }> = ({ title, style, isHaveMargin }) => {
 
-    const defaultStyle = 'm-3 font-bold text-2xl';
+    const defaultStyle = `m-3 font-bold text-2xl`;
     if (!style) {
         style = defaultStyle;
     }
