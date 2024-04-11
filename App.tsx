@@ -1,14 +1,27 @@
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { ForgotPassword, Home, SignIn, VerifyCodeOTP } from './app/pages';
 import { Provider } from 'react-redux';
-import { Home, SignIn } from './app/pages'
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import store from './app/redux/store';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { AuthStack } from './app/stack';
 
-export default function App() {
+const Stack = createNativeStackNavigator();
+
+function App() {
   return (
     <Provider store={store}>
       <GestureHandlerRootView className='flex flex-1'>
-        <SignIn />
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName='AuthStack'>
+            <Stack.Screen name="AuthStack" component={AuthStack} options={{ headerShown: false }} />
+            <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
+          </Stack.Navigator>
+        </NavigationContainer>
       </GestureHandlerRootView>
     </Provider>
   );
 }
+
+export default App;
