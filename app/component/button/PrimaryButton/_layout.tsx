@@ -6,14 +6,15 @@ const PrimaryButton: React.FC<{
     title: string;
     onPress: any;
     style?: string;
-}> = ({ title, onPress, style }) => {
+    disabled?: boolean;
+}> = ({ title, onPress, style, disabled = false }) => {
 
-    const defaultButtonStyle = 'items-center justify-center p-4 bg-black rounded-xl w-full';
+    const defaultButtonStyle = 'items-center justify-center p-4 rounded-xl w-full';
     if (!style) {
         style = defaultButtonStyle
     }
 
-    return <TouchableOpacity onPress={onPress} className={style} >
+    return <TouchableOpacity onPress={onPress} className={style} disabled={disabled} style={disabled ? { backgroundColor: 'grey' } : { backgroundColor: 'black' }}>
         <Text className="text-l font-semibold text-white">{title}</Text>
     </TouchableOpacity>
 }
