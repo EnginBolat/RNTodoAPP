@@ -5,7 +5,7 @@ import { KeyboardTypeOptions, TextInput } from 'react-native';
 const PrimaryInput: React.FC<{
     value: string;
     setValue?: React.Dispatch<React.SetStateAction<string>>;
-    onChangeText: any;
+    onChangeText?: any;
     placeHolder: string;
     style?: string;
     keyboardType?: KeyboardTypeOptions;
