@@ -1,0 +1,1 @@
+export { default as ErrorText } from './_layout';
