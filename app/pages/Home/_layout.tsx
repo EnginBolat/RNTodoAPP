@@ -52,7 +52,7 @@ const Home = () => {
         if (hour.getHours() <= 5) { message = "Good Morning" }
         else if (hour.getHours() <= 12) { message = "Good Evening" }
         else if (hour.getHours() <= 14) { message = "Have a good day" }
-        else if (hour.getHours() <= 21) { message = "Good Night" }
+        else { message = "Good Night" }
 
         return <View className="flex items-start justify-start">
             <PrimaryTitle style="font-bold text-xl m-3" title={message} />
