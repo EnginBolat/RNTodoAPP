@@ -1,4 +1,4 @@
-export interface DataInterface {
+export interface TodoModel {
     id?: number;
     title: String;
     description: String;
