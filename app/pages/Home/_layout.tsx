@@ -1,19 +1,23 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, SafeAreaView, ScrollView, } from 'react-native';
-import { AppleStyleSwipable, CustomLoading, PrimaryTitle } from "../../component";
-import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import { DataInterface } from "../../model/DataInterface";
-import { AddTodo } from "../AddTodo";
-import Checkbox from 'expo-checkbox';
-import { FloatingAction } from "react-native-floating-action";
 import moment from "moment";
-import { useAppDispatch, useAppSelector } from "../../redux/store";
-import { addTodo, deleteTodo, performOperation, updateTodo } from "../../redux/todoSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { FloatingAction } from "react-native-floating-action";
+import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+
+import { Todo } from "../../model";
+import { AddTodo } from "../AddTodo";
+import { AppDispatch, RootState } from "../../redux/";
+import { addTodo, deleteTodo, fetchTodo, updateTodo } from "../../redux";
+import { AppleStyleSwipable, CustomLoading, PrimaryTitle } from "../../component";
+import Checkbox from "expo-checkbox";
 
 const Home = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [date, setDate] = useState(new Date());
+
+    // ? Bottom Sheet
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
     const snapPoints = useMemo(() => ['50%', '50%'], []);
     const handlePresentModalPress = useCallback(() => {
@@ -23,23 +27,20 @@ const Home = () => {
         console.log('handleSheetChanges', index);
     }, []);
 
-    const { data } = useAppSelector((state) => state.todo);
-    const todoDispatch = useAppDispatch();
+    const { data, error, loading } = useSelector((state: RootState) => state.todo);
+    const dispatch = useDispatch<AppDispatch>();
 
-    useEffect(() => {
-        todoDispatch(performOperation({ method: 'GET' }));
-        createGreetings();
-    }, []);
+    useEffect(() => { dispatch(fetchTodo()) }, [])
 
     async function addTodoFunc() {
         try {
-            const item: DataInterface = {
+            const item: Todo = {
                 title: title,
                 description: description,
                 createdDate: date.toString(),
                 isDone: false
             };
-            await todoDispatch(addTodo(item));
+            await dispatch(addTodo(item));
             bottomSheetModalRef.current?.close();
         } catch (error) {
             console.error('Perform operation hatası:', error);
@@ -57,24 +58,33 @@ const Home = () => {
         return <View className="flex items-start justify-start">
             <PrimaryTitle style="font-bold text-xl m-3" title={message} />
         </View>
+    }
 
+    if (loading) {
+        <CustomLoading />
+    }
+
+    if (error) {
+        return <View className="flex flex-1 justify-center items-center">
+            <Text>{error}</Text>
+        </View>
     }
 
     function renderItem() {
         if (!data) {
-            return <CustomLoading />; // veya bir yükleme göstergesi veya hata mesajı döndürebilirsiniz
+            return <CustomLoading />;
         }
 
         if (data.length <= 0) {
             return <View className="flex flex-1 items-center justify-center">
                 <PrimaryTitle title="No To Do Found" style="text-gray-500 font-semibold text-lg" />
-            </View>; // Eğer daha önceden eklenen bir iş yoksa:
+            </View>;
         }
 
-        const groupedData: { [key: string]: DataInterface[] } = {};
+        const groupedData: { [key: string]: Todo[] } = {};
         const today = moment().format('YYYY-MM-DD'); // Bugünkü tarih
 
-        data.forEach((item: DataInterface) => {
+        data.forEach((item: Todo) => {
             const dateKey = moment(item.createdDate).format('YYYY-MM-DD');
             if (!groupedData[dateKey]) {
                 groupedData[dateKey] = [];
@@ -84,7 +94,7 @@ const Home = () => {
         return Object.keys(groupedData).map((date: string, index: number) => (
             <View key={index} >
                 <Text className="px-3 text-lg font-bold mt-5">{date === today ? 'Today' : moment(date).format('D MMMM')}</Text>
-                {groupedData[date].map((item: DataInterface, index: number) => (
+                {groupedData[date].map((item: Todo, index: number) => (
                     <DetailsRow key={index} item={item} onPress={() => { }} />
                 ))}
             </View>
@@ -129,15 +139,13 @@ const Home = () => {
 
 export default Home;
 
+const DetailsRow: React.FC<{ item: Todo, onPress: any }> = ({ item, onPress }) => {
 
-
-const DetailsRow: React.FC<{ item: DataInterface, onPress: any }> = ({ item, onPress }) => {
-
-    const todoDispatch = useAppDispatch();
-
-    async function updateIsDone(item: DataInterface, isDone: boolean) {
+    const dispatch = useDispatch<AppDispatch>();
+    async function updateIsDone(item: Todo, isDone: boolean) {
         try {
-            await todoDispatch(updateTodo({
+            // ! Update TODO
+            await dispatch(updateTodo({
                 id: item.id,
                 title: item.title,
                 description: item.description,
@@ -151,7 +159,8 @@ const DetailsRow: React.FC<{ item: DataInterface, onPress: any }> = ({ item, onP
 
     async function deleteData(id: number) {
         try {
-            await todoDispatch(deleteTodo(id));
+            console.log('id:', id);
+            await dispatch(deleteTodo(id));
         } catch (error) {
             console.error('Perform operation hatası:', error);
         }
@@ -173,7 +182,7 @@ const DetailsRow: React.FC<{ item: DataInterface, onPress: any }> = ({ item, onP
                         value={selected}
                         onValueChange={(value: boolean) => {
                             setSelected(value);
-                            updateIsDone(item, value);
+                            updateIsDone(item, value)
                         }}
                         color={'black'}
                     />
